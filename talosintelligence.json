@@ -361,6 +361,523 @@
                 "type": "table"
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "domain enrichment",
+            "identifier": "domain_enrichment",
+            "description": "Offers additional context on why a domain recieved an untrusted verdict",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "domain"
+                },
+                "response_type": {
+                    "description": "Response type of domain enrichment",
+                    "value_list": ["Context Tags", "STIX"],
+                    "data_type": "string",
+                    "default": "Context Tags",
+                    "order": 1,
+                    "name": "Response Type",
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string",
+                    "column_name": "Threat Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Supporting Evidence",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_values": [
+                         "Enrichment results for domain retrieved"
+                    ]
+                }
+            ],
+            "render": {
+                "title": "Domain Enrichment Results",
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "url enrichment",
+            "identifier": "url_enrichment",
+            "description": "Offers additional context on why an url recieved an untrusted verdict",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "url"
+                },
+                "response_type": {
+                    "description": "Response type of domain enrichment",
+                    "value_list": ["Context Tags", "STIX"],
+                    "data_type": "string",
+                    "default": "Context Tags",
+                    "order": 1,
+                    "name": "Response Type",
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "Url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string",
+                    "column_name": "Threat Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Supporting Evidence",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Enrichment results for url retrieved"
+                    ]
+                }
+            ],
+            "render": {
+                "title": "URL Enrichment Results",
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip enrichment",
+            "identifier": "ip_enrichment",
+            "description": "Offers additional context on why an ip recieved an untrusted verdict",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "ip"
+                },
+                "response_type": {
+                    "description": "Response type of domain enrichment",
+                    "value_list": ["Context Tags", "STIX"],
+                    "data_type": "string",
+                    "default": "Context Tags",
+                    "order": 1,
+                    "name": "Response Type",
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Ip",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string",
+                    "column_name": "Threat Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Supporting Evidence",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Enrichment results for ip address retrieved"
+                    ]
+                }
+            ],
+            "render": {
+                "title": "IP Enrichment Results",
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain prevalence",
+            "identifier": "domain_prevalence",
+            "description": "Provides prevelance data for organizational domains lor fully qualified domain names",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "domains": {
+                    "description": "Comma seperated list of domains to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "example_values": [
+                         "google.com, mail.google.com"
+                    ],
+                    "order": 0,
+                    "name": "domains"
+                },
+                "first_seen": {
+                    "description": "Timestamp in YYYY-MM-DD or YYYY-MM-DDThh:mm:ss formats representing the when first seen. If specified results only after seen on this date are returned",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-10-23"
+                    ],
+                    "name": "First Seen"
+                },
+                "last_seen": {
+                    "description": "Timestamp in YYYY-MM-DD or YYYY-MM-DDThh:mm:ss formats representing the time last seen. If specified results only before this date are returned",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-10-23"
+                    ],
+                    "name": "Last Seen"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.domains",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.dataset",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_values": [
+                         "Domain successfully queried"
+                    ]
+                }
+            ],
+            "render": {
+                "title": "Domain Prevelenace",
+                "type": "custom",
+                "view": "tallosintelligence_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip prevalence",
+            "identifier": "ip_prevalence",
+            "description": "Provides prevelance data for organizational ips lor fully qualified ip names",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ips": {
+                    "description": "Comma seperated list of ips to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                         "10.9.8.34, 192.168.252.199"
+                    ],
+                    "order": 0,
+                    "name": "ips"
+                },
+                "first_seen": {
+                    "description": "Timestamp in YYYY-MM-DD or YYYY-MM-DDThh:mm:ss formats representing the when first seen. If specified results only after seen on this date are returned",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-10-23"
+                    ],
+                    "name": "First Seen"
+                },
+                "last_seen": {
+                    "description": "Timestamp in YYYY-MM-DD or YYYY-MM-DDThh:mm:ss formats representing the time last seen. If specified results only before this date are returned",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-10-23"
+                    ],
+                    "name": "Last Seen"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ips",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.dataset",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.datasets.*.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_values": [
+                         "Domain successfully queried"
+                    ]
+                }
+            ],
+            "render": {
+                "title": "IP Prevelenace",
+                "type": "custom",
+                "view": "tallosintelligence_view.display_view"
+            },
+            "versions": "EQ(*)"
         }
     ],
     "copied_from_id": 190,

@@ -96,7 +96,7 @@ class TalosIntelligenceConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_response(self, r, action_result, retry=3):
+    def _process_response(self, r, action_result):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': r.status_code})
@@ -105,16 +105,10 @@ class TalosIntelligenceConnector(BaseConnector):
 
         retryable_error_codes = {2, 4, 8, 9, 13, 14}
 
-        if retry < MAX_REQUEST_RETRIES:
-            if r.headers.get('grpc-status', 0) in retryable_error_codes:
-                return action_result.set_status(
-                        phantom.APP_ERROR, "Got retryable grpc-status of {0} with message {1}".format(r.headers['grpc-status'], r.headers.get('grpc-message', "Error"))
-                    ), r
-
-            if r.status_code == 503:
-                return action_result.set_status(
-                        phantom.APP_ERROR, "Got retryable http status code {0}".format(r.status_code)
-                    ), r
+        if r.headers.get('grpc-status', 0) in retryable_error_codes:
+            return action_result.set_status(
+                    phantom.APP_ERROR, "Got retryable grpc-status of {0} with message {1}".format(r.headers['grpc-status'], r.headers.get('grpc-message', "Error"))
+                ), r
 
         # Process each 'Content-Type' of response separately
 
@@ -141,7 +135,7 @@ class TalosIntelligenceConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, retry, endpoint, action_result, method="get", **kwargs):
+    def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
         config = self.get_config()
@@ -155,16 +149,15 @@ class TalosIntelligenceConnector(BaseConnector):
         for i in range(MAX_CONNECTION_RETIRIES):
             try:
                 request_func = getattr(self.client, method)
-
                 r = request_func(
                     url,
                     **kwargs
                 )
             except Exception as e:
                 self.debug_print(f"Retrying to establish connection to the server for the {i + 1} time")
-                jittered_delay = random.randint(delay * 0.9, delay * 1.1)
+                jittered_delay = random.uniform(delay * 0.9, delay * 1.1)
                 time.sleep(jittered_delay)
-                delay = max(delay * 2, 256)
+                delay = min(delay * 2, 256)
 
                 with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix="test") as temp_file:
                     cert = f"-----BEGIN CERTIFICATE-----\n{self._cert}\n-----END CERTIFICATE-----\n-----BEGIN RSA PRIVATE KEY-----\n{self._key}\n-----END RSA PRIVATE KEY-----\n"
@@ -183,12 +176,12 @@ class TalosIntelligenceConnector(BaseConnector):
                         ), resp_json
                     )
 
-        return self._process_response(r, action_result, retry)
+        return self._process_response(r, action_result)
 
     def _make_rest_call_helper(self, *args, **kwargs):
         request_delay = 0.25
-        for i in range(MAX_REQUEST_RETRIES + 1):
-            ret_val, response = self._make_rest_call(i, *args, **kwargs)
+        for i in range(MAX_REQUEST_RETRIES):
+            ret_val, response = self._make_rest_call(*args, **kwargs)
             if phantom.is_fail(ret_val) and response:
                 time.sleep(request_delay)
                 request_delay *= 2
@@ -223,12 +216,19 @@ class TalosIntelligenceConnector(BaseConnector):
 
         try:
             ip_addr = ipaddress.ip_address(ip)
+            is_ipv4 = True if isinstance(ip_addr, ipaddress.IPv4Address) else False
             big_endian = int(ip_addr)
         except Exception as exc:
             return action_result.set_status(phantom.APP_ERROR, f"Please provide a valid IP Address. Error: {exc}")
 
+        endpoint = {}
+        if is_ipv4:
+            endpoint["ipv4_addr"] = big_endian
+        else:
+            endpoint["ipv6_addr"] = big_endian
+
         payload = {
-            "urls": { "endpoint": [{"ipv4_addr": big_endian}]},
+            "urls": { "endpoint": [endpoint]},
             "app_info": self._appinfo
         }
 
@@ -310,6 +310,166 @@ class TalosIntelligenceConnector(BaseConnector):
         summary["Message"] = "URL successfully queried"
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_domain_enrichment(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        domain = param['domain']
+        response_type = param.get("response_type", "Context Tags")
+        endpoint = ENDPOINT_ENRICH_DOMAIN
+
+        if response_type == "STIX":
+            endpoint = ENDPOINT_ENRICH_DOMAIN_STIX
+
+        payload = {
+            "domain": domain,
+            "app_info": self._appinfo
+        }
+
+        ret_val, response = self._make_rest_call_helper(
+            endpoint, action_result, method="post", json=payload
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if response_type == "STIX":
+            self._process_response_stix(response, action_result)
+        else:
+            self._process_taxonomy(response, action_result)
+
+        summary = action_result.update_summary({})
+        summary["Message"] = "Enrichment results for domain retrieved"
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_url_enrichment(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        url = param['url']
+        response_type = param.get("response_type", "Context Tags")
+        endpoint = ENDPOINT_ENRICH_URL
+
+        if response_type == "STIX":
+            endpoint = ENDPOINT_ENRICH_URL_STIX
+
+        payload = {
+            "url": {"raw_url": url},
+            "app_info": self._appinfo
+        }
+
+        ret_val, response = self._make_rest_call_helper(
+            endpoint, action_result, method="post", json=payload
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if response_type == "STIX":
+            self._process_response_stix(response, action_result)
+        else:
+            ret_val = self._process_taxonomy(response, action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+        summary = action_result.update_summary({})
+        summary["Message"] = "Enrichment results for url retrieved"
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_ip_enrichment(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ip = param['ip']
+        response_type = param.get("response_type", "Context Tags")
+        endpoint = ENDPOINT_ENRICH_IP
+
+        if response_type == "STIX":
+            endpoint = ENDPOINT_ENRICH_IP_STIX
+
+        try:
+            ip_addr = ipaddress.ip_address(ip)
+            big_endian = int(ip_addr)
+        except Exception as exc:
+            return action_result.set_status(phantom.APP_ERROR, f"Please provide a valid IP Address. Error: {exc}")
+
+        payload = {
+            "endpoint": {"ipv4_addr": big_endian},
+            "app_info": self._appinfo
+        }
+
+        ret_val, response = self._make_rest_call_helper(
+            endpoint, action_result, method="post", json=payload
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if response_type == "STIX":
+            self._process_response_stix(response, action_result)
+        else:
+            ret_val = self._process_taxonomy(response, action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+        summary = action_result.update_summary({})
+        summary["Message"] = "Enrichment results for ip retrieved"
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _process_response_stix(self, response, action_result):
+        self.debug_print("stix response jsonn final")
+        data = response.get("json", {})
+        stix_data = json.loads(data)
+        self.debug_print(stix_data)
+        for obj in stix_data.get('objects', []):
+            # obj_type = obj.get("attack-pattern")
+            action_result.add_data(obj)
+            self.debug_print(obj)
+        return phantom.APP_SUCCESS
+
+    def _process_taxonomy(self, response, action_result):
+        new_taxonomy_fetched = False
+        taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result)
+        if phantom.is_fail(taxonomy_ret_val):
+            return action_result.get_status()
+
+        self.debug_print("processing tax")
+        self.debug_print(response)
+        response_taxonomy_map_version = response["taxonomy_map_version"]
+
+        if response_taxonomy_map_version > self._state["taxonomy_version"]:
+            taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result, allow_cache=False)
+
+        if phantom.is_fail(taxonomy_ret_val) or "context_tags" not in response:
+            return action_result.get_status()
+
+        for tag in response["context_tags"]:
+            tax_id = str(tag["taxonomy_id"])
+            entry_id = str(tag["taxonomy_entry_id"])
+
+            if tax_id != MITRE_ATTACK_TAX_ID or tax_id not in taxonomy["taxonomies"]:
+                # currently enrichment is only supported for MITRE ATTACKs
+                continue
+
+            if not taxonomy["taxonomies"][tax_id]["is_avail"]:
+                if taxonomy["taxonomies"][tax_id]["vers_avail"]["starting"] > taxonomy["taxonomies"][tax_id]["vers_avail"]["ending"] and not new_taxonomy_fetched:
+                    taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result, allow_cache=False)
+                    new_taxonomy_fetched = True
+                    if not taxonomy["taxonomies"][tax_id]["is_avail"]:
+                        # even after fetching the taxonomy we're looking for isn't available
+                        continue
+                else:
+                    continue
+
+            category = taxonomy["taxonomies"][tax_id]["name"]["en-us"]["text"]
+            name = taxonomy["taxonomies"][tax_id]["entries"][entry_id]["name"]["en-us"]["text"]
+            description = taxonomy["taxonomies"][tax_id]["entries"][entry_id]["description"]["en-us"]["text"]
+
+            output = {}
+            output["category"] = category
+            output["name"] = name
+            output["description"] = description
+            action_result.add_data(output)
+
+        return phantom.APP_SUCCESS
+
     def _query_reputation(self, action_result, payload, observable=None):
         new_taxonomy_fetched = False
 
@@ -331,7 +491,7 @@ class TalosIntelligenceConnector(BaseConnector):
             new_taxonomy_fetched = True
             taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result, allow_cache=False)
 
-        if phantom.is_fail(ret_val) or "results" not in response:
+        if phantom.is_fail(taxonomy_ret_val) or "results" not in response:
             return action_result.get_status()
 
         threat_level = ""
@@ -404,6 +564,80 @@ class TalosIntelligenceConnector(BaseConnector):
 
         return ret_val, taxonomy
 
+    def _handle_domain_prevalence(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        domains = param["domains"]
+        domains_list = [item.strip() for item in domains.split(',') if item.strip()]
+        first_seen = param.get("first_seen")
+        last_seen = param.get("last_seen")
+
+        payload = {
+            "domain": domains_list,
+            "app_info": self._appinfo
+        }
+
+        if first_seen:
+            payload["first_seen"] = first_seen
+
+        if last_seen:
+            payload["last_seen"] = last_seen
+
+        ret_val, response = self._make_rest_call_helper(
+            ENDPOINT_DOMAIN_PREVALENCE, action_result, method="post", json=payload
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        data = response["responses"]
+        for domain in data:
+            data[domain]["domain"] = domain
+            action_result.add_data(data[domain])
+        datasets_type = type(data["cisco.com"]["datasets"])
+        self.debug_print(f"type is {datasets_type}")
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_ip_prevalence(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ips = param["ips"]
+        ips_list = [item.strip() for item in ips.split(',') if item.strip()]
+        first_seen = param.get("first_seen")
+        last_seen = param.get("last_seen")
+        ips_in_request = []
+
+        try:
+            for ip in ips_list:
+                ip_addr = ipaddress.ip_address(ip)
+                ips_in_request.append(int(ip_addr))
+        except Exception as exc:
+            return action_result.set_status(phantom.APP_ERROR, f"Please provide a valid IP Address. Error: {exc}")
+
+        payload = {
+            "endpoint": {"ipv4_addr": ips_in_request},
+            "app_info": self._appinfo
+        }
+
+        if first_seen:
+            payload["first_seen"] = first_seen
+
+        if last_seen:
+            payload["last_seen"] = last_seen
+
+        ret_val, response = self._make_rest_call_helper(
+            ENDPOINT_DOMAIN_PREVALENCE, action_result, method="post", json=payload
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        data = response["responses"]
+        action_result.add_data(data)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
@@ -414,14 +648,29 @@ class TalosIntelligenceConnector(BaseConnector):
         if action_id == 'ip_reputation':
             ret_val = self._handle_ip_reputation(param)
 
-        if action_id == 'domain_reputation':
+        elif action_id == 'domain_reputation':
             ret_val = self._handle_domain_reputation(param)
 
-        if action_id == 'url_reputation':
+        elif action_id == 'url_reputation':
             ret_val = self._handle_url_reputation(param)
 
-        if action_id == 'test_connectivity':
+        elif action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
+
+        elif action_id == 'ip_enrichment':
+            ret_val = self._handle_ip_enrichment(param)
+
+        elif action_id == 'domain_enrichment':
+            ret_val = self._handle_domain_enrichment(param)
+
+        elif action_id == 'url_enrichment':
+            ret_val = self._handle_url_enrichment(param)
+
+        elif action_id == 'domain_prevalence':
+            ret_val = self._handle_domain_prevalence(param)
+
+        elif action_id == 'ip_prevalence':
+            ret_val = self._handle_ip_prevalence(param)
 
         return ret_val
 
