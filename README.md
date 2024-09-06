@@ -1,7 +1,7 @@
 [comment]: # "Auto-generated SOAR connector documentation"
-# Talos Intelligence
+# Talos Intelligence V2
 
-Publisher: Splunk Community  
+Publisher: Splunk  
 Connector Version: 1.0.1  
 Product Vendor: Cisco  
 Product Name: Talos Cloud Intelligence  
@@ -35,6 +35,8 @@ Validate the asset configuration for connectivity using supplied configuration
 Type: **test**  
 Read only: **True**
 
+Action used the URS API to get a list of the AUP categories used to classify website content.
+
 #### Action Parameters
 No parameters are required for this action
 
@@ -46,6 +48,8 @@ Queries IP info
 
 Type: **investigate**  
 Read only: **True**
+
+Provides informations on an IP addresses reputation, enabling you to take proper action against untrusted, and unwated resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -70,6 +74,8 @@ Queries domain info
 Type: **investigate**  
 Read only: **True**
 
+Provides informations on a domains reputation, enabling you to take proper action against untrusted, and unwated resources.
+
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
@@ -92,6 +98,8 @@ Queries URL info
 
 Type: **investigate**  
 Read only: **True**
+
+Provides informations on an urls reputation, enabling you to take proper action against untrusted, and unwated resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
