@@ -14,6 +14,7 @@
     "app_version": "1.0.1",
     "utctime_updated": "2024-06-21T18:40:03.685771Z",
     "package_name": "phantom_talosintelligencev2",
+    "fips_compliant": false,
     "main_module": "talosintelligence_connector.py",
     "min_phantom_version": "6.2.1.305",
     "app_wizard_version": "1.0.0",
