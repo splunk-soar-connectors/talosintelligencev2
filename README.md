@@ -70,7 +70,7 @@ Queries IP info
 Type: **investigate**  
 Read only: **True**
 
-Provides informations on an IP addresses reputation, enabling you to take proper action against untrusted, and unwated resources.
+Provides information on an IP address's reputation, enabling you to take proper action against untrusted, and unwanted resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -95,7 +95,7 @@ Queries domain info
 Type: **investigate**  
 Read only: **True**
 
-Provides informations on a domains reputation, enabling you to take proper action against untrusted, and unwated resources.
+Provides information on a domain's reputation, enabling you to take proper action against untrusted, and unwanted resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -120,7 +120,7 @@ Queries URL info
 Type: **investigate**  
 Read only: **True**
 
-Provides informations on an urls reputation, enabling you to take proper action against untrusted, and unwated resources.
+Provides information on an url's reputation, enabling you to take proper action against untrusted, and unwanted resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
