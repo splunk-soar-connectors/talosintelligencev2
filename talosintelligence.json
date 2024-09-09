@@ -142,7 +142,7 @@
             "action": "domain reputation",
             "identifier": "domain_reputation",
             "description": "Queries domain info",
-            "verbose": "Provides informations on a domains reputation, enabling you to take proper action against untrusted, and unwated resources.",
+            "verbose": "Provides information on a domain's reputation, enabling you to take proper action against untrusted, and unwanted resources.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
