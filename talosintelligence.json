@@ -78,7 +78,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "ips"
+                        "ip"
                     ],
                     "value_list": [],
                     "default": "",
@@ -177,7 +177,7 @@
                     "data_type": "string",
                     "primary": true,
                     "contains": [
-                        "ips"
+                        "ip"
                     ],
                     "value_list": [],
                     "default": "",
