@@ -348,7 +348,7 @@ class TalosIntelligenceConnector(BaseConnector):
                         continue
 
                     if not taxonomy["taxonomies"][tax_id]["is_avail"]:
-                        if taxonomy["taxonomies"][tax_id]["vers_avail"]["starting"] > taxonomy["taxonomies"][tax_id]["vers_avail"]["ending"] and not new_taxonomy_fetched:
+                        if taxonomy["taxonomies"][tax_id]["vers_avail"]["starting"] > taxonomy["taxonomies"][tax_id]["version"] and not new_taxonomy_fetched:
                             taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result, allow_cache=False)
                             new_taxonomy_fetched = True
                             if not taxonomy["taxonomies"][tax_id]["is_avail"]:
