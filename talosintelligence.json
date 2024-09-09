@@ -68,7 +68,7 @@
             "action": "ip reputation",
             "identifier": "ip_reputation",
             "description": "Queries IP info",
-            "verbose": "Provides informations on an IP addresses reputation, enabling you to take proper action against untrusted, and unwated resources.",
+            "verbose": "Provides information on an IP address's reputation, enabling you to take proper action against untrusted, and unwanted resources.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
