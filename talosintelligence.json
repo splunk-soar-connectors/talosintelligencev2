@@ -72,7 +72,7 @@
             "type": "investigate",
             "read_only": true,
             "parameters": {
-                "ip": {
+                "ips": {
                     "description": "IP to query",
                     "data_type": "string",
                     "required": true,
