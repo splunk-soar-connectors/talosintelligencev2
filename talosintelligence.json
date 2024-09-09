@@ -10,7 +10,7 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) Splunk Community, 2024",
+    "license": "Copyright (c) 2017-2024 Splunk Inc.",
     "app_version": "1.0.1",
     "utctime_updated": "2024-06-21T18:40:03.685771Z",
     "package_name": "phantom_talosintelligencev2",
@@ -41,6 +41,12 @@
             "description": "Private key to authenticate with Talos",
             "name": "key",
             "id": 2
+        },
+        "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "default": false,
+            "order": 3
         }
     },
     "actions": [
