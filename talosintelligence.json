@@ -8,6 +8,9 @@
     "logo_dark": "talosintelligence_dark.svg",
     "product_name": "Talos Cloud Intelligence",
     "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud, Sept 9, 2024"
+    ],
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2017-2024 Splunk Inc.",
