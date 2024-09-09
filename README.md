@@ -10,10 +10,6 @@ Minimum Product Version: 6.2.1.305
 
 This app provides investigative actions for Talos Intelligence
 
-
-Replace this text in the app's **readme.html** to contain more detailed information
-
-
 ### Configuration Variables
 The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a Talos Cloud Intelligence asset in SOAR.
 
@@ -22,6 +18,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **base_url** |  required  | string | Base URL provided by Talos
 **certificate** |  optional  | password | Certificate contents to authenticate with Talos
 **key** |  optional  | password | Private key to authenticate with Talos
+**verify_server_cert** |  optional  | boolean | Verify server certificate
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
