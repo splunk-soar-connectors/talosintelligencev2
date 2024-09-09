@@ -50,7 +50,7 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip** |  required  | IP to query | string |  `ips` 
+**ips** |  required  | IP to query | string |  `ips` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
