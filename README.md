@@ -50,7 +50,7 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ips** |  required  | IP to query | string |  `ips` 
+**ips** |  required  | IP to query | string |  `ip` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -76,7 +76,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **domain** |  required  | Domain to query | string |  `domain`  `url` 
-**ips** |  optional  | Corresponding IPs to the domain. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response | string |  `ips` 
+**ips** |  optional  | Corresponding IPs to the domain. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response | string |  `ip` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
