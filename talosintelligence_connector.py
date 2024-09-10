@@ -193,7 +193,15 @@ class TalosIntelligenceConnector(BaseConnector):
 
     def _make_rest_call_helper(self, *args, **kwargs):
         request_delay = 0.25
+        start_time = time.time()
+        remaining_time = MAX_REQUEST_TIMEOUT
         for i in range(MAX_REQUEST_RETRIES + 1):
+            elapsed_time = time.time() - start_time
+            remaining_time -= elapsed_time
+            if remaining_time <= 0:
+                action_result = args[1]
+                return action_result.set_status(phantom.APP_ERROR, "Max request timeout of 5s exceeded"), None
+
             ret_val, response = self._make_rest_call(i, *args, **kwargs)
             if phantom.is_fail(ret_val) and response:
                 time.sleep(request_delay)
@@ -405,7 +413,7 @@ class TalosIntelligenceConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(
             ENDPOINT_QUERY_TAXONOMIES, action_result, method="post", json=payload
         )
-        self.debug_print("fetching taxonomyyy")
+        self.debug_print("fetching taxonomy")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
