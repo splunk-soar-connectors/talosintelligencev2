@@ -111,8 +111,10 @@ class TalosIntelligenceConnector(BaseConnector):
 
         if retry < MAX_REQUEST_RETRIES:
             if r.headers.get('grpc-status', 0) in retryable_error_codes:
+                err_msg = r.headers.get('grpc-message', 'Error')
                 return action_result.set_status(
-                        phantom.APP_ERROR, "Got retryable grpc-status of {0} with message {1}".format(r.headers['grpc-status'], r.headers.get('grpc-message', "Error"))
+                        phantom.APP_ERROR,
+                        f"Got retryable grpc-status of {r.headers['grpc-status']} with message {err_msg}"
                     ), r
 
             if r.status_code == 503:
@@ -173,7 +175,8 @@ class TalosIntelligenceConnector(BaseConnector):
                 delay = min(delay * 2, 256)
 
                 with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix="test") as temp_file:
-                    cert = f"-----BEGIN CERTIFICATE-----\n{self._cert}\n-----END CERTIFICATE-----\n-----BEGIN RSA PRIVATE KEY-----\n{self._key}\n-----END RSA PRIVATE KEY-----\n"
+                    cert_string = f"-----BEGIN CERTIFICATE-----\n{self._cert}\n-----END CERTIFICATE-----"
+                    cert = f"{cert_string}\n-----BEGIN RSA PRIVATE KEY-----\n{self._key}\n-----END RSA PRIVATE KEY-----\n"
                     temp_file.write(cert)
                     temp_file.seek(0)  # Move the file pointer to the beginning for reading
                     temp_file_path = temp_file.name  # Get the name of the temporary file
@@ -330,7 +333,7 @@ class TalosIntelligenceConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _query_reputation(self, action_result, payload, observable=None):
-        new_taxonomy_fetched = False
+        new_tax_fetched = False
 
         taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result)
 
@@ -347,7 +350,7 @@ class TalosIntelligenceConnector(BaseConnector):
         response_taxonomy_map_version = response["taxonomy_map_version"]
 
         if response_taxonomy_map_version > self._state["taxonomy_version"]:
-            new_taxonomy_fetched = True
+            new_tax_fetched = True
             taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result, allow_cache=False)
 
         if phantom.is_fail(ret_val) or "results" not in response:
@@ -367,9 +370,10 @@ class TalosIntelligenceConnector(BaseConnector):
                         continue
 
                     if not taxonomy["taxonomies"][tax_id]["is_avail"]:
-                        if taxonomy["taxonomies"][tax_id]["vers_avail"]["starting"] > taxonomy["taxonomies"][tax_id]["version"] and not new_taxonomy_fetched:
+                        tax_starting_availability = taxonomy["taxonomies"][tax_id]["vers_avail"]["starting"]
+                        if tax_starting_availability > taxonomy["taxonomies"][tax_id]["version"] and not new_tax_fetched:
                             taxonomy_ret_val, taxonomy = self._fetch_taxonomy(action_result, allow_cache=False)
-                            new_taxonomy_fetched = True
+                            new_tax_fetched = True
                             if not taxonomy["taxonomies"][tax_id]["is_avail"]:
                                 # even after fetching the taxonomy we're looking for isn't available
                                 continue
@@ -492,7 +496,11 @@ class TalosIntelligenceConnector(BaseConnector):
         config = self.get_config()
 
         def insert_newlines(string, every=64):
-            return '\n'.join(string[i:i + every] for i in range(0, len(string), every))
+            lines = []
+            for i in range(0, len(string), every):
+                lines.append(string[i:i + every])
+                
+            return '\n'.join(lines)
 
         self._base_url = config['base_url']
         self._cert = insert_newlines(config["certificate"])
@@ -518,7 +526,7 @@ class TalosIntelligenceConnector(BaseConnector):
             "product_id": "soar",
             "device_id": self.get_product_installation_id(),
             "product_version": self.get_product_version(),
-            "perf_testing": True,
+            "perf_testing": False,
         }
         if is_dev_env:
             self._appinfo["perf_testing"] = True
