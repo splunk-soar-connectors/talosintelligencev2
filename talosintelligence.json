@@ -1,6 +1,6 @@
 {
     "appid": "7c653487-22c8-4ec1-bca0-16a8b1513c86",
-    "name": "Talos Intelligence",
+    "name": "Cisco Talos Intelligence",
     "description": "This app provides investigative actions for Talos Intelligence",
     "type": "information",
     "product_vendor": "Cisco",
@@ -13,7 +13,7 @@
     "license": "Copyright (c) Splunk Community, 2024",
     "app_version": "1.0.0",
     "utctime_updated": "2024-06-21T18:40:03.685771Z",
-    "package_name": "phantom_talosintelligence",
+    "package_name": "phantom_ciscotalosintelligence",
     "main_module": "talosintelligence_connector.py",
     "min_phantom_version": "6.2.1.305",
     "app_wizard_version": "1.0.0",
