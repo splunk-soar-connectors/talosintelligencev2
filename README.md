@@ -1,5 +1,5 @@
 [comment]: # "Auto-generated SOAR connector documentation"
-# Talos Intelligence
+# Cisco Talos Intelligence
 
 Publisher: Splunk Community  
 Connector Version: 1.0.0  
