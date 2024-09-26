@@ -23,11 +23,13 @@ import tempfile
 import httpx
 import ipaddress
 import time
+import textwrap
 import random
-import validators
+import re
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from datetime import datetime
+from urllib.parse import urlparse
 
 
 class RetVal(tuple):
@@ -257,12 +259,18 @@ class TalosIntelligenceConnector(BaseConnector):
         summary["Message"] = "IP successfully queried"
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _is_valid_domain(self, domain):
+        regex = r"^(?!-)([A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,}$"
+        if re.match(regex, domain):
+            return True
+        return False
+
     def _handle_domain_reputation(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         domain = param['domain']
-        if not validators.domain(domain):
+        if not self._is_valid_domain(domain):
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid url")
         ips = param.get("ips", "")
         ips_list = [item.strip() for item in ips.split(',') if item.strip()]
@@ -294,12 +302,16 @@ class TalosIntelligenceConnector(BaseConnector):
         summary["Message"] = "Domain successfully queried"
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _is_valid_url(self, url):
+        parsed_url = urlparse(url)
+        return bool(parsed_url.scheme and parsed_url.netloc)
+
     def _handle_url_reputation(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         url = param['url']
-        if not validators.url(url):
+        if not self._is_valid_url(url):
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid url")
 
         ips = param.get("ips", "")
@@ -499,16 +511,19 @@ class TalosIntelligenceConnector(BaseConnector):
             lines = []
             for i in range(0, len(string), every):
                 lines.append(string[i:i + every])
-                
+
             return '\n'.join(lines)
 
         self._base_url = config['base_url']
         self._cert = insert_newlines(config["certificate"])
         self._key = insert_newlines(config["key"])
 
-        cert_string = f"-----BEGIN CERTIFICATE-----\n{self._cert}\n-----END CERTIFICATE-----"
+        cert_string = f"-----BEGIN CERTIFICATE-----\n{textwrap.fill(self._cert, 64)}\n-----END CERTIFICATE-----"
         cert_pem_data = cert_string.encode("utf-8")
-        cert = x509.load_pem_x509_certificate(cert_pem_data, default_backend())
+        try:
+            cert = x509.load_pem_x509_certificate(cert_pem_data, default_backend())
+        except Exception as e:
+            self.debug_print(f"Error when loadig cert {e}")
         crl_urls = self.fetch_crls(cert)
         self.debug_print(f"crl urls are {crl_urls}")
         for crl in crl_urls:
@@ -532,7 +547,7 @@ class TalosIntelligenceConnector(BaseConnector):
             self._appinfo["perf_testing"] = True
 
         with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix="test") as temp_file:
-            cert = f"{cert_string}\n-----BEGIN RSA PRIVATE KEY-----\n{self._key}\n-----END RSA PRIVATE KEY-----\n"
+            cert = f"{cert_string}\n-----BEGIN RSA PRIVATE KEY-----\n{textwrap.fill(self._key, 64)}\n-----END RSA PRIVATE KEY-----\n"
 
             temp_file.write(cert)
             temp_file.seek(0)  # Move the file pointer to the beginning for reading
