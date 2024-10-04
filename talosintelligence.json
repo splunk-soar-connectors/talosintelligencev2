@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
     "license": "Copyright (c) Splunk Community, 2024",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "utctime_updated": "2024-06-21T18:40:03.685771Z",
     "package_name": "phantom_ciscotalosintelligence",
     "main_module": "talosintelligence_connector.py",
@@ -78,7 +78,8 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "value_list": [],
                     "default": "",
@@ -140,7 +141,7 @@
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
                     "example_values": [
-                         "IP successfully queried"
+                         "72.163.4.185 has a Favorable threat level"
                     ]
                 }
             ],
@@ -176,9 +177,6 @@
                     "description": "Corresponding IPs to the domain. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response",
                     "data_type": "string",
                     "primary": true,
-                    "contains": [
-                        "ip"
-                    ],
                     "value_list": [],
                     "default": "",
                     "order": 1,
@@ -247,7 +245,7 @@
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
                     "example_values": [
-                         "Domain successfully queried"
+                         "splunk.com has a Favorable threat level"
                     ]
                 }
             ],
@@ -282,9 +280,6 @@
                     "description": "Corresponding IPs to the url. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response",
                     "data_type": "string",
                     "primary": true,
-                    "contains": [
-                        "ip"
-                    ],
                     "value_list": [],
                     "default": "",
                     "order": 1,
@@ -352,7 +347,7 @@
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
                     "example_values": [
-                         "URL successfully queried"
+                         "https://splunk.com has a Favorable threat level"
                     ]
                 }
             ],

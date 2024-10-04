@@ -234,6 +234,12 @@ class TalosIntelligenceConnector(BaseConnector):
         self._state = {}
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def format_ip_type(self, ip_addr):
+        if isinstance(ip_addr, ipaddress.IPv4Address):
+            return {"ipv4_addr": int(ip_addr)}
+        else:
+            return {"ipv6_addr": ip_addr.packed.hex()}
+
     def _handle_ip_reputation(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -242,12 +248,13 @@ class TalosIntelligenceConnector(BaseConnector):
 
         try:
             ip_addr = ipaddress.ip_address(ip)
-            big_endian = int(ip_addr)
+            ip_request = self.format_ip_type(ip_addr)
         except Exception as exc:
             return action_result.set_status(phantom.APP_ERROR, f"Please provide a valid IP Address. Error: {exc}")
+        self.debug_print(f"ip request is {ip_request}")
 
         payload = {
-            "urls": { "endpoint": [{"ipv4_addr": big_endian}]},
+            "urls": { "endpoint": [ip_request]},
             "app_info": self._appinfo
         }
 
@@ -256,7 +263,10 @@ class TalosIntelligenceConnector(BaseConnector):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
-        summary["Message"] = "IP successfully queried"
+        summary["Message"] = "IP WORKED"
+        threat_level = action_result.get_data()[0]["Threat_Level"]
+        summary["Message"] = f"{ip} has a {threat_level} threat level"
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _is_valid_domain(self, domain):
@@ -280,8 +290,8 @@ class TalosIntelligenceConnector(BaseConnector):
         for ip in ips_list:
             try:
                 ip_addr = ipaddress.ip_address(ip)
-                big_endian = int(ip_addr)
-                endpoints.append({"ipv4_addr": big_endian})
+                ip_request = self.format_ip_type(ip_addr)
+                endpoints.append(ip_request)
             except Exception as exc:
                 self.debug_print(f"{ip} is not a valid ip address got. Error: {exc}")
 
@@ -299,7 +309,8 @@ class TalosIntelligenceConnector(BaseConnector):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
-        summary["Message"] = "Domain successfully queried"
+        threat_level = action_result.get_data()[0]["Threat_Level"]
+        summary["Message"] = f"{domain} has a {threat_level} threat level"
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _is_valid_url(self, url):
@@ -322,8 +333,8 @@ class TalosIntelligenceConnector(BaseConnector):
         for ip in ips_list:
             try:
                 ip_addr = ipaddress.ip_address(ip)
-                big_endian = int(ip_addr)
-                endpoints.append({"ipv4_addr": big_endian})
+                ip_request = self.format_ip_type(ip_addr)
+                endpoints.append(ip_request)
             except Exception as exc:
                 self.debug_print(f"{ip} is not a valid ip address. Error: {exc}")
 
@@ -341,7 +352,8 @@ class TalosIntelligenceConnector(BaseConnector):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
-        summary["Message"] = "URL successfully queried"
+        threat_level = action_result.get_data()[0]["Threat_Level"]
+        summary["Message"] = f"{url} has a {threat_level} threat level"
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _query_reputation(self, action_result, payload, observable=None):
