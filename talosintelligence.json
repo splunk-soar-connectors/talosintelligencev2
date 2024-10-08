@@ -32,7 +32,7 @@
             "data_type": "string",
             "order": 0,
             "description": "Base URL provided by Talos",
-            "default": "consumerdev-api.talos.cisco.com",
+            "default": "https://soar-api.talos.cisco.com",
             "required": true,
             "name": "base_url",
             "id": 0
