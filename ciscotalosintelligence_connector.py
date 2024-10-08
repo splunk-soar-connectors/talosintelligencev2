@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 
-from talosintelligence_consts import *
+from ciscotalosintelligence_consts import *
 
 
 class RetVal(tuple):
