@@ -2,7 +2,7 @@
 # Cisco Talos Intelligence
 
 Publisher: Splunk Community  
-Connector Version: 1.0.0  
+Connector Version: 1.0.1  
 Product Vendor: Cisco  
 Product Name: Talos Cloud Intelligence  
 Product Version Supported (regex): ".\*"  
@@ -50,7 +50,7 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip** |  required  | IP to query | string |  `ip` 
+**ip** |  required  | IP to query | string |  `ip`  `ipv6` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -64,7 +64,7 @@ action_result.data.\*.Observable | string |  |
 action_result.data.\*.Threat_Level | string |  |  
 action_result.data.\*.Threat_Categories | string |  |  
 action_result.data.\*.AUP | string |  |  
-action_result.summary.message | string |  |   IP successfully queried   
+action_result.summary.message | string |  |   72.163.4.185 has a Favorable threat level   
 
 ## action: 'domain reputation'
 Queries domain info
@@ -76,7 +76,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **domain** |  required  | Domain to query | string |  `domain`  `url` 
-**ips** |  optional  | Corresponding IPs to the domain. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response | string |  `ip` 
+**ips** |  optional  | Corresponding IPs to the domain. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -91,7 +91,7 @@ action_result.data.\*.Observable | string |  |
 action_result.data.\*.Threat_Level | string |  |  
 action_result.data.\*.Threat_Categories | string |  |  
 action_result.data.\*.AUP | string |  |  
-action_result.summary.message | string |  |   Domain successfully queried   
+action_result.summary.message | string |  |   splunk.com has a Favorable threat level   
 
 ## action: 'url reputation'
 Queries URL info
@@ -103,7 +103,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **url** |  required  | URL to query | string |  `url` 
-**ips** |  optional  | Corresponding IPs to the url. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response | string |  `ip` 
+**ips** |  optional  | Corresponding IPs to the url. A domain may have a different reputation based on the IP it resolves to. Passing an IP can improve the accuracy of the response | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -118,4 +118,4 @@ action_result.data.\*.Observable | string |  |
 action_result.data.\*.Threat_Level | string |  |  
 action_result.data.\*.Threat_Categories | string |  |  
 action_result.data.\*.AUP | string |  |  
-action_result.summary.message | string |  |   URL successfully queried 
+action_result.summary.message | string |  |   https://splunk.com has a Favorable threat level 
