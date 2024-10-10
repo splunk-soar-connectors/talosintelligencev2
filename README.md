@@ -46,9 +46,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
-[ip reputation](#action-ip-reputation) - Queries IP info  
-[domain reputation](#action-domain-reputation) - Queries domain info  
-[url reputation](#action-url-reputation) - Queries URL info  
+[ip reputation](#action-ip-reputation) - Query IP info  
+[domain reputation](#action-domain-reputation) - Query domain info  
+[url reputation](#action-url-reputation) - Query URL info  
 
 ## action: 'test connectivity'
 Validate the asset configuration for connectivity using supplied configuration
@@ -56,7 +56,7 @@ Validate the asset configuration for connectivity using supplied configuration
 Type: **test**  
 Read only: **True**
 
-Action used the URS API to get a list of the AUP categories used to classify website content.
+Action uses the URS API to get a list of the AUP categories used to classify website content.
 
 #### Action Parameters
 No parameters are required for this action
@@ -65,12 +65,12 @@ No parameters are required for this action
 No Output  
 
 ## action: 'ip reputation'
-Queries IP info
+Query IP info
 
 Type: **investigate**  
 Read only: **True**
 
-Provides information on an IP address's reputation, enabling you to take proper action against untrusted, and unwanted resources.
+Provide information on an IP address's reputation, enabling you to take proper action against untrusted, and unwanted resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -90,12 +90,12 @@ action_result.data.1.Threat Categories | string |  |
 action_result.data.2.Acceptable Use Policy Categories | string |  |    
 
 ## action: 'domain reputation'
-Queries domain info
+Query domain info
 
 Type: **investigate**  
 Read only: **True**
 
-Provides information on a domain's reputation, enabling you to take proper action against untrusted, and unwanted resources.
+Provide information on a domain's reputation, enabling you to take proper action against untrusted, and unwanted resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -115,12 +115,12 @@ action_result.data.1.Threat Categories | string |  |
 action_result.data.2.Acceptable Use Policy Categories | string |  |    
 
 ## action: 'url reputation'
-Queries URL info
+Query URL info
 
 Type: **investigate**  
 Read only: **True**
 
-Provides information on an url's reputation, enabling you to take proper action against untrusted, and unwanted resources.
+Provide information on an URL's reputation, enabling you to take proper action against untrusted, and unwanted resources.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
